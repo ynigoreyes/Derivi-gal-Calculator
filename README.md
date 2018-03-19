@@ -9,4 +9,4 @@ credentials, and equation history
 <hr>
 
 
-###### *This repo is intended for education purposes only. The templating is from the [Mathjax](http://mathjs.org/examples/browser/pretty_printing_with_mathjax.html) Javasript library*
+###### *This repo is intended for education purposes only. The templating is from the [Mathjax](http://mathjs.org/examples/browser/pretty_printing_with_mathjax.html) Javasript library documentation*
