@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session, url_for
 import json
 import sympy
-from gunicorn import *
+# from gunicorn import *
 
 app = Flask(__name__)
 app.secret_key = 'DGCalc'
