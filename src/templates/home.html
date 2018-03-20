@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div id="theBigDiv">
+    <header>Hello Students! Welcome to Derivi-gal Calculator!</header>
+    <table>
+        <tr>
+            <th>Expression</th>
+            <td>
+                <input type="text" id="expr">
+            </td>
+            <td>
+                <select name="operation" id="operationDropdown">
+                    <option value="derivative">Integral</option>
+                    <option value="integral">Derivative</option>
+                </select>
+            </td>
+            <!-- <th>Second Column Test</th> -->
+        </tr>
+        <tr>
+            <th>Pretty print</th>
+            <td>
+                <div id="pretty">$$$$</div>
+            </td>
+        </tr>
+        <tr>
+            <th>Result</th>
+            <td>
+                <div id="result"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>Tips for input</th>
+            <td>
+                <div id="tips">
+                    <ul>
+                        <li>Remember to use parenthesis in trig</li>
+                        <small>example: cos(90) not cos90</small>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

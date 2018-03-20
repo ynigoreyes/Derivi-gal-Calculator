@@ -1,0 +1,39 @@
+body,
+h1,
+html,
+table td,
+table th,
+input[type=text],
+input[type=password] {
+    font-size: 18pt;
+    font-family: verdana, arial, sans-serif;
+}
+#theBigDiv{
+    margin: auto;
+    text-align: center;
+}
+
+header {
+    font-size: 40px;
+}
+
+input[type=text],
+input[type=password] {
+    padding: 5px;
+    width: 400px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table td,
+table th {
+    padding: 5px;
+    border: 1px solid lightgray;
+}
+
+table th {
+    background-color: lightgray;
+}
