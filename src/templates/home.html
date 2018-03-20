@@ -6,12 +6,12 @@
         <tr>
             <th>Expression</th>
             <td>
-                <input type="text" id="expr">
+                <input type="text" id="expr"><input id="solveButton" type="button" value="Solve!">
             </td>
             <td>
                 <select name="operation" id="operationDropdown">
-                    <option value="derivative">Integral</option>
-                    <option value="integral">Derivative</option>
+                    <option value="integrate">Integral</option>
+                    <option value="derive">Derivative</option>
                 </select>
             </td>
             <!-- <th>Second Column Test</th> -->
@@ -19,7 +19,7 @@
         <tr>
             <th>Pretty print</th>
             <td>
-                <div id="pretty">$$$$</div>
+                <div id="pretty"></div>
             </td>
         </tr>
         <tr>
@@ -35,6 +35,8 @@
                     <ul>
                         <li>Remember to use parenthesis in trig</li>
                         <small>example: cos(90) not cos90</small>
+                        <li>When multiplying, use the * symbol</li>
+                        <small>2*x not 2x</small>
                     </ul>
                 </div>
             </td>

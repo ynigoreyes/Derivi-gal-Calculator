@@ -1,14 +1,17 @@
-from flask import Flask, render_template, request, session, url_for, redirect
+from __future__ import division
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify,  abort
 from functools import wraps
 import json
 import os
-import sympy
+from sympy import integrate, symbols, diff
 
 app = Flask(__name__)
 app.secret_key = 'DGCalc'
 
 # List of things we need to solve
+# TODO: Ask Nils about how to handle this kind of Error
 #
+# How to write readable code
 # How to get the history
 # How to show the answers to the equation
 # How to login so that we can see how we can save our history
@@ -23,6 +26,7 @@ app.secret_key = 'DGCalc'
 # Rewrite the register and login routes to use MySQL
 
 LOGIN_DIR = 'user/logins.txt'
+x = symbols('x')
 
 def is_logged_in(f):
     """
@@ -116,6 +120,47 @@ def getHistory():
     """
     pass
 
+@app.route('/api/evaluate', methods=['POST'])
+def evaluate():
+    print('in /api/evaluate')
+    """
+    Evaluates the expression given
+
+    Needs the:
+    1. Operation to execute
+    2. The equation to execute upon
+    3. Setting symbol to x
+    """
+    data = request.get_json()
+
+    errorMessage = None
+    equation = data['equation']
+    operation = data['operation']
+    answer = "~"
+
+    # Integration or Derivitive
+    if operation == 'integrate':
+        try:
+            answer = integrate(equation, x)
+        except:
+            #TODO: Ask Nils about how to handle this kind of Error
+            print('error reading the equation')
+            errorMessage = 'error reading the equation'
+    elif operation == 'derive':
+        try:
+            answer = diff(equation, x)
+        except:
+            print('error reading the equation')
+            errorMessage = 'error reading the equation'
+    else:
+        abort(404)
+
+    return jsonify({'data': {
+        'answer': str(answer),
+        'errorMessage': errorMessage
+    }})
+
+@app.route('/api/test', methods=['POST'])
 def testing():
     pass
 
