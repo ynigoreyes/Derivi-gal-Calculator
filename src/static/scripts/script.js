@@ -1,7 +1,7 @@
 // Home page and actual calculations
 console.log('connected to JS');
 
-const initEquation = 'sqrt(75 / 3) + sin(pi / 4)^2';
+const initEquation = 'sqrt(75 / 3) + sin(x / 4)^2';
 
 var expr = document.getElementById('expr'),
     pretty = document.getElementById('pretty'),
