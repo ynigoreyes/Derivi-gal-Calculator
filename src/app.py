@@ -145,10 +145,6 @@ def getHistory():
     """
     pass
 
-<<<<<<< HEAD
-if __name__ == '__main__':
-    app.run()
-=======
 @app.route('/api/evaluate', methods=['POST'])
 def evaluate():
     print('in /api/evaluate')
@@ -199,5 +195,3 @@ def testing():
 
 if __name__ == '__main__':
     app.run()
-    # testing()
->>>>>>> 2d69e63eb482a0024e925b736a70fe91fe1daae8
