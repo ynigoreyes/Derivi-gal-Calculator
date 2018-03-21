@@ -1,14 +1,18 @@
-from flask import Flask, render_template, request, session, url_for, redirect
+from __future__ import division
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify,  abort
 from functools import wraps
 import json
 import os
-import sympy
+from sympy import integrate, symbols, diff
 
 app = Flask(__name__)
 app.secret_key = 'DGCalc'
 
 # List of things we need to solve
+# TODO: Ask Nils about how to handle this kind of Error
+# TODO: Fix the parsing of equation on server-side
 #
+# How to write readable code
 # How to get the history
 # How to show the answers to the equation
 # How to login so that we can see how we can save our history
@@ -23,6 +27,7 @@ app.secret_key = 'DGCalc'
 # Rewrite the register and login routes to use MySQL
 
 LOGIN_DIR = 'user/logins.txt'
+x = symbols('x')
 
 def is_logged_in(f):
     """
@@ -51,6 +56,30 @@ def register():
     """
     if request.method == 'GET':
         return render_template('register.html')
+    if request.method == 'POST':
+        data = request.get_json()
+
+        name = data['name']
+        username = data['username']
+        email = data['email']
+        password = data['password']
+        confirmPassword = data['confirPassword']
+
+        if confirmPassword != password:
+            passwordError = "Passwords do not match"
+        elif len(username) > 5:
+            usernameError = "Username must be at least 5 characters long"
+        elif "@" not in email:
+            emailError = "This email is invalid"
+        else:
+            with open(LOGIN_DIR, "a") as userLog:
+                userLog.write("{}, {}, {}, {}\n".format(name, username, email, password))
+        response = {
+            "passwordError": passwordError,
+            "usernameError": usernameError,
+            "emailError": emailError
+        }
+        return jsonify(response)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -116,5 +145,59 @@ def getHistory():
     """
     pass
 
+<<<<<<< HEAD
 if __name__ == '__main__':
     app.run()
+=======
+@app.route('/api/evaluate', methods=['POST'])
+def evaluate():
+    print('in /api/evaluate')
+    """
+    Evaluates the expression given
+
+    Needs the:
+    1. Operation to execute
+    2. The equation to execute upon
+    3. Setting symbol to x
+    """
+    data = request.get_json()
+
+    errorMessage = None
+    equation = data['equation']
+    operation = data['operation']
+    print(equation)
+    print(operation)
+    answer = "~"
+
+    # Integration or Derivitive
+    if operation == 'integrate':
+        try:
+            answer = str(integrate(equation, x))
+        except:
+            #TODO: Ask Nils about how to handle this kind of Error
+            print('error reading the equation')
+            errorMessage = 'error reading the equation'
+    elif operation == 'derive':
+        try:
+            answer = str(diff(equation, x))
+        except:
+            print('error reading the equation')
+            errorMessage = 'error reading the equation'
+    else:
+        abort(404)
+
+    if "**" in answer:
+        answer = answer.replace("**", "^")
+    return jsonify({'data': {
+        'answer': str(answer),
+        'errorMessage': errorMessage
+    }})
+
+@app.route('/api/test', methods=['POST'])
+def testing():
+    pass
+
+if __name__ == '__main__':
+    app.run()
+    # testing()
+>>>>>>> 2d69e63eb482a0024e925b736a70fe91fe1daae8

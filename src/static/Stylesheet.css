@@ -18,9 +18,10 @@ header {
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+input[type=button] {
     padding: 5px;
-    width: 400px;
+    width: 100%;
 }
 
 table {
