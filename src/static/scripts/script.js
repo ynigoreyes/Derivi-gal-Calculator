@@ -62,6 +62,9 @@ $(solve).on('click', function(){
 function updateLatex() {
     /*Shows what the user is typing*/
     var node = null;
+    console.log('updating latex');
+    operationState = expressionDropdown.value;
+    console.log(operationState);
     try {
         // parse the expression
         node = math.parse(expr.value);

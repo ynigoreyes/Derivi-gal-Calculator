@@ -4,7 +4,7 @@
 # Started 3/19/2018
 # Derivigal-Calculator
 #
-# This is a web app using Flask-Python with Javscript
+# This is a web app using Flask-Python with Javascript
 # The purpose of this app is to show students what the real world use of python is
 #
 # Many of the students that attend ACMSDC Python Software Development are underclassman
@@ -14,9 +14,9 @@
 # Python is used in the real world. In this case, it was used for rapid development.
 #
 # The situation goes as stated...
-# Students are constantly switching between integral and derivitive calculator so
+# Students are constantly switching between integral and derivative calculator so
 # I am taking the time to make these two one web app that all students can use. It
-# also prints out the answer in a way that most online homework text feilds will accept
+# also prints out the answer in a way that most online homework text fields will accept
 #
 # CAUTION: APP WILL NOT WORK AFTER APRIL 30, 2018. MATHJAX CDN WILL NOT BE WORKING
 
@@ -49,6 +49,7 @@ app.secret_key = 'DGCalc'
 LOGIN_DIR = 'user/logins.txt'
 x = symbols('x')
 
+
 def is_logged_in(f):
     """
     This is the wrapper that will make sure that those who do have not logged in,
@@ -62,9 +63,11 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap
 
+
 @app.route('/', methods=['GET'])
 def home():
     return render_template('home.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -74,6 +77,10 @@ def register():
     A cool feature would be to allow the backend to send
     messages to be displayed on the home screen
     """
+    passwordError = None
+    usernameError = None
+    emailError = None
+
     if request.method == 'GET':
         return render_template('register.html')
     if request.method == 'POST':
@@ -83,7 +90,7 @@ def register():
         username = data['username']
         email = data['email']
         password = data['password']
-        confirmPassword = data['confirPassword']
+        confirmPassword = data['confirmPassword']
 
         # Form Validation
         if confirmPassword != password:
@@ -104,6 +111,7 @@ def register():
         }
         return jsonify(response)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -112,7 +120,7 @@ def login():
 
     POST:
     Gets data from POST to compare to the text file lines.
-    If there is a user found in the textfile, then we will set the user's login
+    If there is a user found in the text file, then we will set the user's login
     status to True and their credentials to the recorded data. This can be used
     throughout the application
 
@@ -148,15 +156,18 @@ def login():
         if session['logged_in'] is False:                       # Checks to see if there is someone with that username
             print('Sorry, No user found with that name')        # Sends an error message to the user (replace with json)
 
+
 @app.route('/logout')
 @is_logged_in
 def logout():
     session.clear()
     return redirect(url_for("home"))
 
+
 @app.route('/account', methods=['GET'])
 def account():
     return render_template('account.html')
+
 
 @app.route('/api/get-history', methods=['GET'])
 def getHistory():
@@ -168,9 +179,9 @@ def getHistory():
     """
     pass
 
+
 @app.route('/api/evaluate', methods=['POST'])
 def evaluate():
-    print('in /api/evaluate')
     """
     Evaluates the expression given
 
@@ -201,6 +212,7 @@ def evaluate():
         'answer': str(answer),
         'errorMessage': errorMessage
     }})
+
 
 if __name__ == '__main__':
     app.run()
