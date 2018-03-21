@@ -5,21 +5,37 @@ var expr = document.getElementById('expr'),
     result = document.getElementById('result'),
     solve = document.getElementById('solveButton'),
     expressionDropdown = document.getElementById('operationDropdown'),
+    operationState = 'integrate',
+    errors = document.getElementById('errors'),
+    equationPost = 'sqrt(75 / 3) + sin(pi / 4)^2', // Equation we will be posting
     validPost = true,
     parenthesis = 'keep',
     implicit = 'hide';
 
 // initialize with an example expression
-expr.value = 'sin(x)';
-// This will display an integral to the user using dx
-pretty.innerHTML = '$$\\int(' + math.parse(expr.value).toTex({parenthesis: parenthesis}) + ') dx$$';
-result.innerHTML = '<span style="color: green;"> Press Solve to Evaluate!</span>';
+expr.value = 'sqrt(75 / 3) + sin(pi / 4)^2';
+pretty.innerHTML = '$$\\int' + math.parse(expr.value).toTex({ parenthesis: parenthesis }) + ' dx$$';
+
+$(expressionDropdown).on('change', function(){
+    console.log('change operations')
+    operationState = $(this).val();
+    console.log(operationState);
+    if (operationState == 'integrate') {
+        console.log('using integrate');
+        updateLatex()
+    } else if (operationState == 'derive') {
+        console.log('using derive');
+        updateLatex()
+    };
+});
 
 // Solves the equation by sending the information to backend for processing
 $(solve).on('click', function(){
+    console.log('solving...')
+    console.log('sending ' + equationPost + ' to evaluate...')
     if(validPost == true){
         var postData = {
-            "equation": expr.value,
+            "equation": equationPost,
             "operation": expressionDropdown.value
 
         }
@@ -35,7 +51,8 @@ $(solve).on('click', function(){
                 errorMessage = responseData['data']['errorMessage']
                 if (errorMessage == null){
                     answer = responseData['data']['answer']
-                    result.innerHTML = math.format(math.parse(answer));
+                    console.log(answer)
+                    result.innerHTML = "[" + math.format(math.parse(answer)) + "] + C";
 
                 } else{
                     result.innerHTML = '<span style="color: red;">' + errorMessage + '</span>';
@@ -46,28 +63,30 @@ $(solve).on('click', function(){
     }
 });
 
+expr.oninput = updateLatex;
 
-expr.oninput = function () {
+function updateLatex() {
     var node = null;
     try {
-        // parse the expression to reprint nicely
+        // parse the expression // Interupt the original chain
         node = math.parse(expr.value);
-        // evaluate the result of the expression
-        result.innerHTML = '<span style="color: green;"> Press Solve to Evaluate!</span>';
-        validPost = true;
-    } catch (err) {
-        // insert the error message from the backend here
-        validPost = false;
-        result.innerHTML = '<span style="color: red;"> Cannot Read Input</span>';
+        equationPost = node.toString()
     }
+    catch (err) {}
 
     try {
+        if (operationState == 'integrate'){
+            var latex = node ? "\\int" + node.toTex({ parenthesis: parenthesis }) + " dx" : '';
+            console.log('LaTeX expression:', latex);
+        } else if (operationState == 'derive'){
+            var latex = node ? node.toTex({ parenthesis: parenthesis }) + " d/dx" : '';
+            console.log('LaTeX expression:', latex);
+        };
         // export the expression to LaTeX
-        var latex = node ? '\\int(' + node.toTex({ parenthesis: parenthesis, implicit: implicit }) + ') dx' : '';
 
         // display and re-render the expression
         var elem = MathJax.Hub.getAllJax('pretty')[0];
         MathJax.Hub.Queue(['Text', elem, latex]);
-
-    } catch (err){ }
+    }
+    catch (err) { }
 };
