@@ -6,6 +6,22 @@ To demonstrate the real world uses of Python in the real world. This project
 focuses on web application development and students will learn how to use the
 Python-Flask Web Application Framework to make a simple API that saves user
 credentials, and equation history
+
+### Requirements
+* Pip installed
+
+### How to use
+1. Clone repository using Command Line
+```
+$ git clone https://github.com/ynigoreyes/Derivi-gal-Calculator.git
+$ cd Derivi-gal-Calculator
+```
+2. Go to src directory and run app.py
+```
+$ cd src/
+$ python app.py
+```
+3. Open browser and go to 127.0.0.1:5000
 <hr>
 
 
