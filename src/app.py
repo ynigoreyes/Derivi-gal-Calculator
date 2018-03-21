@@ -1,8 +1,28 @@
+# Ynigo Reyes
+# Texas Tech University
+# Computer Science
+# Started 3/19/2018
+# Derivigal-Calculator
+#
+# This is a web app using Flask-Python with Javscript
+# The purpose of this app is to show students what the real world use of python is
+#
+# Many of the students that attend ACMSDC Python Software Development are underclassman
+# who may have never had any experience programming before and there are some students
+# who come thinking that Python is useless and a kid's language. This type of web app's
+# difficulty to high enough to challenge the beginners and show the naysayers that
+# Python is used in the real world. In this case, it was used for rapid development.
+#
+# The situation goes as stated...
+# Students are constantly switching between integral and derivitive calculator so
+# I am taking the time to make these two one web app that all students can use. It
+# also prints out the answer in a way that most online homework text feilds will accept
+#
+# CAUTION: APP WILL NOT WORK AFTER APRIL 30, 2018. MATHJAX CDN WILL NOT BE WORKING
+
 from __future__ import division
-from flask import Flask, render_template, request, session, url_for, redirect, jsonify,  abort
 from functools import wraps
-import json
-import os
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify, abort
 from sympy import integrate, symbols, diff
 
 app = Flask(__name__)
@@ -10,7 +30,6 @@ app.secret_key = 'DGCalc'
 
 # List of things we need to solve
 # TODO: Ask Nils about how to handle this kind of Error
-# TODO: Fix the parsing of equation on server-side
 #
 # How to write readable code
 # How to get the history
@@ -25,6 +44,7 @@ app.secret_key = 'DGCalc'
 
 # Challenge:
 # Rewrite the register and login routes to use MySQL
+# Fix the implicit multiplication problem
 
 LOGIN_DIR = 'user/logins.txt'
 x = symbols('x')
@@ -65,6 +85,7 @@ def register():
         password = data['password']
         confirmPassword = data['confirPassword']
 
+        # Form Validation
         if confirmPassword != password:
             passwordError = "Passwords do not match"
         elif len(username) > 5:
@@ -72,8 +93,10 @@ def register():
         elif "@" not in email:
             emailError = "This email is invalid"
         else:
+            # Saves the user's information in a text file
             with open(LOGIN_DIR, "a") as userLog:
                 userLog.write("{}, {}, {}, {}\n".format(name, username, email, password))
+
         response = {
             "passwordError": passwordError,
             "usernameError": usernameError,
@@ -161,37 +184,23 @@ def evaluate():
     errorMessage = None
     equation = data['equation']
     operation = data['operation']
-    print(equation)
-    print(operation)
     answer = "~"
 
     # Integration or Derivitive
     if operation == 'integrate':
-        try:
-            answer = str(integrate(equation, x))
-        except:
-            #TODO: Ask Nils about how to handle this kind of Error
-            print('error reading the equation')
-            errorMessage = 'error reading the equation'
+        answer = str(integrate(equation, x))
     elif operation == 'derive':
-        try:
-            answer = str(diff(equation, x))
-        except:
-            print('error reading the equation')
-            errorMessage = 'error reading the equation'
+        answer = str(diff(equation, x))
     else:
         abort(404)
 
+    # Needed to fix the syntax so that math.js is able to read sympy
     if "**" in answer:
         answer = answer.replace("**", "^")
     return jsonify({'data': {
         'answer': str(answer),
         'errorMessage': errorMessage
     }})
-
-@app.route('/api/test', methods=['POST'])
-def testing():
-    pass
 
 if __name__ == '__main__':
     app.run()
