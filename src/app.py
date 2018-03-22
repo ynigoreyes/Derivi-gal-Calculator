@@ -104,6 +104,7 @@ def register():
             with open(LOGIN_DIR, "a") as userLog:
                 userLog.write("{}, {}, {}, {}\n".format(name, username, email, password))
 
+
         response = {
             "passwordError": passwordError,
             "usernameError": usernameError,
@@ -215,4 +216,4 @@ def evaluate():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

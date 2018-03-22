@@ -8,6 +8,8 @@ Python-Flask Web Application Framework to make a simple API that saves user
 credentials, and equation history
 
 ### Requirements
+* Python 3 (uses 3.6.4)
+* Your favorite CLI
 * Pip installed
 
 ### How to use
@@ -16,12 +18,16 @@ credentials, and equation history
 $ git clone https://github.com/ynigoreyes/Derivi-gal-Calculator.git
 $ cd Derivi-gal-Calculator
 ```
-2. Go to src directory and run app.py
+2. Install requirements on pip
+```
+$ pip install -r requirements.txt
+```
+3. Go to src directory and run app.py
 ```
 $ cd src/
 $ python app.py
 ```
-3. Open browser and go to 127.0.0.1:5000
+4. Open browser and go to 127.0.0.1:5000
 <hr>
 
 
