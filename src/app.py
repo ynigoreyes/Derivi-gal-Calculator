@@ -22,7 +22,7 @@
 
 from __future__ import division
 from os import getcwd, listdir, path, chdir
-from flask import Flask, render_template, request, session, url_for, redirect, jsonify, abort
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify
 from sympy import integrate, symbols, diff
 from functools import wraps
 from local_db import LOCAL_DB
@@ -40,7 +40,6 @@ historyTable.createColumns("username", "history")
 userTable.createColumns("name", "username", "email", "password")
 
 # List of things we need to solve
-# TODO: Ask Nils about how to handle this kind of Error
 #
 # How to write readable code
 # How to get the history
@@ -56,6 +55,7 @@ userTable.createColumns("name", "username", "email", "password")
 # Challenge:
 # Rewrite the register and login routes to use MySQL
 # Fix the implicit multiplication problem
+
 HOME_DIR = getcwd()
 LOGIN_DIR = path.normpath(getcwd() + '\\user\\logins.txt')
 HISTORY_DIR = path.normpath(getcwd() + '\\user\\history')
@@ -124,11 +124,10 @@ def register():
       errorList.append("This email is invalid")
 
     # Checks for errors
+    # If there are no errors, create a new user in the user and history table
     if len(errorList) == 0:
       userTable.insert([[name, username, email, password]])
-      print("making history table...")
       historyTable.insert([[username, None]])
-
 
     return jsonify({"errorMessages": errorList})
 
@@ -144,12 +143,6 @@ def login():
   If there is a user found in the text file, then we will set the user's login
   status to True and their credentials to the recorded data. This can be used
   throughout the application
-
-  Example:
-  We can send the session['name'] to the front end so that we can see our name
-  on the home page.
-  It would read...
-  "Welcome <session['name']>! This is Derivigal Calculator"
 
   """
   if request.method == 'GET':
@@ -172,7 +165,7 @@ def login():
 
       if pwInput == results[0]:           # If the user's password is correct
         session['logged_in'] = True       # Sets the user's status to logged in
-        session['username'] = userInput  # Gives a unique cookie to work with
+        session['username'] = userInput   # Gives a unique cookie to work with
         errorList = []
 
       else:
@@ -218,8 +211,7 @@ def evaluate():
     answer = str(integrate(equation, x))
   elif operation == 'derive':
     answer = str(diff(equation, x))
-  else:
-    abort(404)
+
   # Needed to fix the syntax so that math.js is able to read sympy
   if "**" in answer:
     answer = answer.replace("**", "^")
@@ -232,22 +224,17 @@ def evaluate():
 def getHistory():
   """
   Gets the history of the current user and sends it in this format
-
-  "history" represents a set
-  This is so that we do not get any duplicates
+  We are not trying to send duplicates so we convert the history into a set and then back into a list so that we can send it through JSON
 
   {
-  "history": {<equation_1>, <equation_2>, <equation_n>}
+  "history": [<equation_1>, <equation_2>, <equation_n>]
   }
   """
-  obj = []
+
   historyTable.select(session["username"], "username", "history")
   data = historyTable.fetchResults(amount=1)
-  # print(data[0])
-  for eachEquation in data[0]:
-    obj.append(eachEquation)
 
-  obj = list(set(obj))
+  obj = list(set(data[0]))
 
   return jsonify({"history": obj})
 
@@ -255,7 +242,6 @@ def getHistory():
 @app.route('/api/get-login-status', methods=['GET'])
 def getLoginStatus():
   status = False
-  name = None
 
   if 'logged_in' in session.keys():
     status = session['logged_in']
@@ -269,93 +255,15 @@ def updateHistory():
   """
   Updates the history of the current user
 
-  "history" represents a set
-  This is so that we do not get any duplicates
-
   {
   "equationPost": "sin(x)"
   }
   """
-  print("updating the history...")
   data = request.get_json()
-
-  historyTable.selectAny("username")
-  users = historyTable.fetchResults()
 
   historyTable.update(session["username"], "username", "history", data["equation"])
 
   return jsonify({"status": "success"})
 
-# Testing API
-@app.route('/test/api/update-history', methods=['POST'])
-def updateHistoryTest():
-  data = request.get_json()
-  userHistoryFile = "HelloWorld.txt"
-  textOption = "w+"
-
-  chdir(HISTORY_DIR)
-  print(getcwd())
-
-  if path.exists(userHistoryFile):
-    print('This user has a history already')
-    textOption = "a"
-  else:
-    print('This user does not yet have a history')
-    textOption = "w+"
-
-  with open("HelloWorld.txt", textOption) as history:
-    print('now connected to history')
-    history.write(data['equationPost'] + ",")
-
-  chdir(HOME_DIR)
-
-  return jsonify({"message": "success"})
-
-
-@app.route('/test/api/get-history', methods=['GET'])
-def getHistoryTest():
-  """
-  Gets the history of the current user and sends it in this format
-
-  "history" represents a set
-  This is so that we do not get any duplicates
-
-  {
-  "history": {<equation_1>, <equation_2>, <equation_n>}
-  }
-  """
-  data = request.get_json()
-  obj = set()
-  historyID = "HelloWorld" + ".txt"
-
-  # Changing dir to work with user information
-  chdir(HISTORY_DIR)
-  with open(historyID, "r") as history:
-    # Splits the read by the commas and
-    # creates a set to get rid of all the duplicates.
-    # .pop() "Pops off" the last element in a list
-    obj = set(history.read().split(","))
-
-    # Converts the set to list because the JSON
-    # does not accept a set as a value type
-    # Filters out the extra blank space that ends up
-    # getting read along with the equations
-    obj = list(filter(None, obj))
-    chdir(HOME_DIR)
-
-  return jsonify({"history": obj})
-
-def test():
-  historyTable = LOCAL_DB("database", "history")
-  userTable = LOCAL_DB("database", "users")
-
-  historyTable.createColumns("username", "history")
-  userTable.createColumns("name", "username", "email", "password")
-
-  # historyTable.insert([["username2", "equation123"]])
-  # historyTable.insert([["username3", "equation13"]])
-  # historyTable.replace("username2", "username", "history", "x + 54")
-
 if __name__ == '__main__':
-  # test()
-  app.run(debug=True)
+  app.run()
