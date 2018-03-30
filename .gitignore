@@ -1,3 +1,5 @@
 DGCalcEnv/
 __pycache__
 .vscode
+local_db.pyc
+database/
