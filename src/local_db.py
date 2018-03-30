@@ -5,10 +5,20 @@ import random
 
 
 class LOCAL_DB():
+  """A Database Object"""
 
   def __init__(self, db_name, table_name):
+    """
+    __init__(self, db_name, table_name):
+
+    @param db_name:
+    The name of the database directory created at root level
+    @param table_name:
+    The name of the table/collection created within the database directory
+
+    """
     # Cache for the database and home directories for ease in navigation
-    self.database_dir = path.normpath(getcwd() + '/database')
+    self.database_dir = path.normpath(getcwd() + '/' + db_name)
     self.home_dir = path.normpath(getcwd())
 
     self.db_name = db_name          # This is the name of the database directory
@@ -22,7 +32,7 @@ class LOCAL_DB():
     self.insertObj = {}             # Used in the insert method
                     								# Creates a dictionary to dump into the table
 
-    if 'database' not in listdir(): # Makes sure the database does not exist yet
+    if db_name not in listdir(): # Makes sure the database does not exist yet
       print('creating database for the first time')
       mkdir(self.database_dir)    	# Makes the database dir if it does not exist
 
@@ -30,7 +40,7 @@ class LOCAL_DB():
 
   def createColumns(self, *args):
     """
-    Associates the table column names wiht the table name
+    Associates the table column names with the table name
     """
     for data in args:
       self.table_columns.append(str(data))
@@ -64,6 +74,7 @@ class LOCAL_DB():
 
     Either way, the entry will always have an Unique ID
 
+    Structure:
     "id": [
       {
         "key": "value"},
@@ -117,16 +128,17 @@ class LOCAL_DB():
 
   def remove(self, value, key, howMany="all"):
     """
-    we will be looking fo the key that has the...
 
-    "value" in the column "key" and will delete "howMany" entries
+    remove(self, value, key, howMany="all"):
 
-    If the user does not pass a howMany variable, we will default
-    to deleting all of them.
+    @param value<string>:
+    The value that we want to delete
+    @param key<string>:
+    The key that we will be looking in
+    @param howMany<integer or "all">:
+    How many entries with this value (defaults to all of the entries)
 
-    TODO: DRY this method up. It works, but will
-    be very hard to maintain in the future. This function looks very ugly...
-
+    Removes all of the entries that have the value in the given key
     """
 
     keyToDelete = None
@@ -334,6 +346,9 @@ class LOCAL_DB():
 
   def fetchResults(self, amount=0):
     """
+
+    fetchResults(self, amount=0):
+
     @param int(amount): The amount of results the user would like to fetch
 
     This is how the user will ask for what we were able to find
@@ -365,8 +380,10 @@ class LOCAL_DB():
         return columnNumbers
 
   def generateID(self):
+    """
+    Generates a random 64-bit ID as an integer
+    """
     seed = random.getrandbits(64)
     while True:
       yield seed
       seed += 1
-
