@@ -315,7 +315,6 @@ class LOCAL_DB():
     for keys in data.keys():
       temp = data[keys][targetColumnNumber][targetColumn]
       if targetValue == temp:
-        print("found a column")
         valueToUpdate = data[keys][selectColumnNumber][selectColumn]
         if valueToUpdate is None:
           valueToUpdate = []
@@ -324,7 +323,6 @@ class LOCAL_DB():
 
         valueToUpdate.append(updateValue)
         data[keys][selectColumnNumber][selectColumn] = valueToUpdate
-        print(data)
 
         with open(self.table_name + ".json", "w+") as table:
           json.dump(data, table, indent=4)
