@@ -11,35 +11,33 @@ $(function(){
       url: '/api/get-login-status',
       success: function (responseData) {
         if (responseData['status'] == true) {
-          console.log("You are logged in");
           LOGIN_STATUS = true;
-        } else {
-          console.log("You have not logged in");
         }
       }
     });
   };
   function getHistory(){
-    console.log("in the getHistory Fucntion")
       $.ajax({
         type: 'GET',
         dataType: "json",
         url: '/api/get-history',
         success: function (responseData) {
-          console.log(responseData);
-          console.log("getting history")
+          $("#userHistory").empty();
+          for(var i = 0; i < responseData['history'].length ;i++){
+            $("#userHistory").append("<p class='historyButtons btn btn-secondary prevPosts'>" + responseData['history'][i] +"</p>");
+          }
         }
       })
   };
 
   // Home page and actual calculations
   if (window.location.pathname == '/') {
-    console.log('connected to Home');
     getLoginStatus();
-    // if(LOGIN_STATUS){
-    // setTimeout(getHistory, 2000)
-      // getHistory();
-    // };
+
+    // Wait for getLoginStatus to finish before checking
+    setTimeout(function(){
+      if(Boolean(LOGIN_STATUS)){getHistory();}
+    }, 1)
 
 
     const initEquation = 'sqrt(75 / 3) + sin(x / 4)^2',
@@ -101,7 +99,6 @@ $(function(){
         });
 
         // Posting equation to the history
-        console.log(equationPost)
         var obj = {
           "equation": equationPost
         }
@@ -111,9 +108,11 @@ $(function(){
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(obj),
           success: function (responseData) {
-            console.log(responseData['pastEquations'])
+            console.log(responseData["status"])
           }
         });
+
+        getHistory()
       }
     });
     function updateLatex() {
@@ -149,7 +148,6 @@ $(function(){
       catch (err) { }
     };
   } else if (window.location.pathname == '/login') {
-    console.log('Connected to login');
     var usernameInput = document.forms[0]["username"]
     var passwordInput = document.forms[0]["password"]
 
@@ -182,7 +180,6 @@ $(function(){
       })
     })
   } else if (window.location.pathname == '/register') {
-    console.log('Connected to register');
 
     const registerButton = document.getElementById('registerButton'),
       name = document.getElementById('nameInput'),
@@ -201,7 +198,7 @@ $(function(){
         'password': password.value,
         'confirmPassword': confirmPassword.value
       }
-      console.log(obj)
+
       $.ajax({
         type: 'POST',
         url: '/register',

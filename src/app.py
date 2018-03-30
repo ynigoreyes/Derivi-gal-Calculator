@@ -241,7 +241,13 @@ def getHistory():
   }
   """
   obj = []
-  obj.append("Hello World")
+  historyTable.select(session["username"], "username", "history")
+  data = historyTable.fetchResults(amount=1)
+  # print(data[0])
+  for eachEquation in data[0]:
+    obj.append(eachEquation)
+
+  obj = list(set(obj))
 
   return jsonify({"history": obj})
 
@@ -278,9 +284,7 @@ def updateHistory():
 
   historyTable.update(session["username"], "username", "history", data["equation"])
 
-  response = "Hello World"
-
-  return jsonify({"pastEquations": response})
+  return jsonify({"status": "success"})
 
 # Testing API
 @app.route('/test/api/update-history', methods=['POST'])
