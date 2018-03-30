@@ -11,6 +11,7 @@ input[type=password] {
 #theBigDiv{
     margin: auto;
     text-align: center;
+    height: 100%;
 }
 
 header {
@@ -37,4 +38,11 @@ table th {
 
 table th {
     background-color: lightgray;
+}
+.btn.prevPosts{
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 10px;
+    width: 100%;
+    white-space: normal;
 }

@@ -1,3 +1,0 @@
-nameAdmin, admin, admin@gmail.com, rootpassword
-nameMiggylol, miggylol, miggylol@gmail.com, rootpassword2
-nameacmsdc, acmsdc, acdsdc@gmail.com, rootpassword3
