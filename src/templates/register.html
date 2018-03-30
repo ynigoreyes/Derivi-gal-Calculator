@@ -1,23 +1,26 @@
 {% extends 'layout.html' %} {% block body %}
-<h1>Registration</h1>
-<form method="POST">
-    <div class="form-group">
-        <input type="text" name="name" placeholder="Name">
-    </div>
-    <div class="form-group">
-        <input type="text" name="username" placeholder="Username">
-    </div>
-    <div class="form-group">
-        <input type="text" name="email" placeholder="Email">
-    </div>
-    <div class="form-group">
-        <input type="password" name="password" placeholder="Password">
-    </div>
-    <div class="form-group">
-        <input type="password" name="confirmPassword" placeholder="Confirm Password">
-    </div>
-    <p>
-        <input type="button" class="btn btn-primary" value="Register">
-    </p>
-</form>
+<div class="container">
+    <h1>Registration</h1>
+    <form id="registrationForm" method="POST">
+        <div class="form-group">
+            <input id="nameInput" type="text" class="registerInput" name="name" placeholder="Name">
+        </div>
+        <div class="form-group">
+            <input id="usernameInput" type="text" class="registerInput" name="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input id="emailInput" type="text" class="registerInput" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <input id="passwordInput" type="password" class="registerInput" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <input id="confirmPasswordInput" type="password" class="registerInput" name="confirmPassword" placeholder="Confirm Password">
+        </div>
+        <p>
+            <button id="registerButton" type="button" class="btn btn-primary" value="Register">Register</button>
+        </p>
+        <div id="errorMessages"></div>
+    </form>
+</div>
 {% endblock %}

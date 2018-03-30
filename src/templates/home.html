@@ -1,49 +1,55 @@
 {% extends 'layout.html' %}
 {% block body %}
-<div id="theBigDiv">
-    <header>Hello Students! Welcome to Derivi-gal Calculator!</header>
-    <p id="errors"></p>
-    <table>
-        <tr>
-            <th>Expression</th>
-            <td>
-                <input type="text" id="expr"><input id="solveButton" type="button" value="Solve!">
-            </td>
-            <td>
-                <select name="operation" id="operationDropdown">
-                    <option value="integrate">Integral</option>
-                    <option value="derive">Derivative</option>
-                </select>
-            </td>
-            <!-- <th>Second Column Test</th> -->
-        </tr>
-        <tr>
-            <th>Pretty print</th>
-            <td>
-                <div id="pretty"></div>
-            </td>
-        </tr>
-        <tr>
-            <th>Result</th>
-            <td>
-                <div id="result"></div>
-            </td>
-        </tr>
-        <tr>
-            <th>Tips for input</th>
-            <td>
-                <div id="tips">
-                    <ul>
-                        <li>Remember to use parenthesis in trig</li>
+<div id="theBigDiv" class="row">
+    <div class="col-10">
+        <header>Hello Students! Welcome to Derivi-gal Calculator!</header>
+        <table>
+            <tr>
+                <th>Expression</th>
+                <td>
+                    <select name="operation" id="operationDropdown">
+                        <option value="integrate">Integral</option>
+                        <option value="derive">Derivative</option>
+                    </select>
+                    <input type="text" id="expr">
+                    <input id="solveButton" type="button" value="Solve!">
+                </td>
+                <!-- <th>Second Column Test</th> -->
+            </tr>
+            <tr>
+                <th>Pretty print</th>
+                <td>
+                    <div id="pretty"></div>
+                </td>
+            </tr>
+            <tr>
+                <th>Result</th>
+                <td>
+                    <div id="result"></div>
+                </td>
+            </tr>
+            <tr>
+                <th>Tips for input</th>
+                <td>
+                    <div id="tips">
+                        <p>Remember to use parenthesis in trig</p>
                         <small>example: cos(90) not cos90</small>
-                        <li>When multiplying, use the * symbol</li>
+                        <p>When multiplying, use the * symbol</p>
                         <small>2*x not 2x</small>
-                        <li>For trig functions, put exponent after closing prenthesis</li>
+                        <p>For trig functions, put exponent after closing prenthesis</p>
                         <small>sin(x)^2 not sin^2(x)</small>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-2" id="historyColumn">
+        <header>History</header>
+        <table>
+            <tr>
+                <div id="userHistory"></div>
+            </tr>
+        </table>
+    </div>
 </div>
 {% endblock %}

@@ -1,20 +1,61 @@
-// Home page and actual calculations
-if (window.location.pathname == '/'){
-    console.log('connected to JS');
+LOGIN_STATUS = false;
 
-    const initEquation = 'sqrt(75 / 3) + sin(x / 4)^2';
+$(function(){
+  // API Calls
+  function getLoginStatus(){
+    $.ajax({
+      // Gets the status of the login status of the user for our code to reference
+      // Uppercase to symbolize global variables
+      type: 'GET',
+      dataType: "json",
+      url: '/api/get-login-status',
+      success: function (responseData) {
+        if (responseData['status'] == true) {
+          console.log("You are logged in");
+          LOGIN_STATUS = true;
+        } else {
+          console.log("You have not logged in");
+        }
+      }
+    });
+  };
+  function getHistory(){
+    console.log("in the getHistory Fucntion")
+      $.ajax({
+        type: 'GET',
+        dataType: "json",
+        url: '/api/get-history',
+        success: function (responseData) {
+          console.log(responseData);
+          console.log("getting history")
+        }
+      })
+  };
 
-    var expr = document.getElementById('expr'),
-        pretty = document.getElementById('pretty'),
-        result = document.getElementById('result'),
-        solve = document.getElementById('solveButton'),
-        expressionDropdown = document.getElementById('operationDropdown'),
-        operationState = 'integrate',
-        errors = document.getElementById('errors'),
-        equationPost = initEquation, // Equation we will be posting
-        validPost = true,
-        parenthesis = 'keep',
-        implicit = 'hide';
+  // Home page and actual calculations
+  if (window.location.pathname == '/') {
+    console.log('connected to Home');
+    getLoginStatus();
+    // if(LOGIN_STATUS){
+    // setTimeout(getHistory, 2000)
+      // getHistory();
+    // };
+
+
+    const initEquation = 'sqrt(75 / 3) + sin(x / 4)^2',
+      expr = document.getElementById('expr'),
+      pretty = document.getElementById('pretty'),
+      result = document.getElementById('result'),
+      solve = document.getElementById('solveButton'),
+      expressionDropdown = document.getElementById('operationDropdown'),
+      userHistory = document.getElementById('userHistory')
+
+    var operationState = 'integrate',
+      errors = document.getElementById('errors'),
+      equationPost = initEquation, // Equation we will be posting
+      validPost = true,
+      parenthesis = 'keep',
+      implicit = 'hide';
 
     // initialize with an example expression
     expr.value = initEquation;
@@ -23,78 +64,165 @@ if (window.location.pathname == '/'){
     // Event Listeners
     $(expressionDropdown).on('change', updateLatex);    // Listens for a  change in the operation choice
     $(expr).on('keyup', updateLatex);                 // Listens for keypresses on the equation text
+    $(userHistory).on('click', '.btn', function (e) {
+      var temp = $(this).closest('.prevPosts')[0].innerText;
+      expr.value = temp;
+      updateLatex();
+    });
 
     // Solves the equation by sending the information to backend for processing
     $(solve).on('click', function () {
+      var answer = 0, errorMessage = "none";
 
-        if (validPost == true) {
-            var postData = {
-                "equation": equationPost,
-                "operation": expressionDropdown.value
-
-            }
-            // Sends a POST request to backend though AJAX
-            // Uses the response to display the answer to the user
-            $.ajax({
-                type: 'POST',
-                url: '/api/evaluate',
-                contentType: 'application/json;charset=UTF-8',
-                data: JSON.stringify(postData),
-                success: function (responseData) {
-
-                    errorMessage = responseData['data']['errorMessage']
-
-                    if (errorMessage == null) {
-                        answer = responseData['data']['answer']
-                        if (expressionDropdown.value == 'integrate') {
-                            result.innerHTML = "[" + math.format(math.parse(answer)) + "] + C";
-                        } else if (expressionDropdown.value == 'derive') {
-                            result.innerHTML = math.format(math.parse(answer))
-                        };
-
-                    } else {
-                        result.innerHTML = '<span style="color: red;">' + errorMessage + '</span>';
-                    }
-
-                }
-            });
+      if (Boolean(validPost)) {
+        var postData = {
+          "equation": equationPost,
+          "operation": expressionDropdown.value
         }
+        // Sends a POST request to backend though AJAX
+        // Uses the response to display the answer to the user
+        $.ajax({
+          type: 'POST',
+          url: '/api/evaluate',
+          contentType: 'application/json;charset=UTF-8',
+          data: JSON.stringify(postData),
+          success: function (responseData) {
+            answer = responseData['answer']
+              // Displays the integral
+            if (expressionDropdown.value == 'integrate') {
+              result.innerHTML = "[" + math.format(math.parse(answer)) + "] + C";
+              // Displays the derivative
+            } else if (expressionDropdown.value == 'derive') {
+              result.innerHTML = math.format(math.parse(answer));
+              // Displays an error message
+            }
+            // $("div#userHistory").append("<p class='prevPosts btn btn-secondary'>" + equationPost + "<p>");
+          }
+        });
+
+        // Posting equation to the history
+        console.log(equationPost)
+        var obj = {
+          "equation": equationPost
+        }
+        $.ajax({
+          type: 'POST',
+          url: '/api/update-history',
+          contentType: 'application/json;charset=UTF-8',
+          data: JSON.stringify(obj),
+          success: function (responseData) {
+            console.log(responseData['pastEquations'])
+          }
+        });
+      }
     });
     function updateLatex() {
-        /*Shows what the user is typing*/
-        var node = null;
-        console.log('updating latex');
-        operationState = expressionDropdown.value;
-        console.log(operationState);
-        try {
-            // parse the expression
-            node = math.parse(expr.value);
-            // This is the part we send to the backend since it is the parsed equation
-            equationPost = node.toString()
-        }
-        catch (err) { }
+      /*Shows what the user is typing and input validation*/
+      var node = null;
+      operationState = expressionDropdown.value;
+      try {
+        // parse the expression
+        node = math.parse(expr.value);
+        validPost = true;
+        $(result).empty();
 
-        try {
-            // We check to see what kind of answer we display to the user
-            if (operationState == 'integrate') {
-                var latex = node ? "\\int" + node.toTex({ parenthesis: parenthesis }) + " dx" : '';
-            } else if (operationState == 'derive') {
-                var latex = node ? node.toTex({ parenthesis: parenthesis }) + " d/dx" : '';
-            };
-            // display and re-render the expression
-            var elem = MathJax.Hub.getAllJax('pretty')[0];
-            MathJax.Hub.Queue(['Text', elem, latex]);
-        }
-        catch (err) { }
+
+        // This is the part we send to the backend since it is the parsed equation
+        equationPost = node.toString()
+      }
+      catch (err) {
+        result.innerHTML = '<span style="color: red;">Syntax Error</span>';
+        validPost = false;
+      }
+
+      try {
+        // We check to see what kind of answer we display to the user
+        if (operationState == 'integrate') {
+          var latex = node ? "\\int" + node.toTex({ parenthesis: parenthesis }) + " dx" : '';
+        } else if (operationState == 'derive') {
+          var latex = node ? node.toTex({ parenthesis: parenthesis }) + " d/dx" : '';
+        };
+        // display and re-render the expression
+        var elem = MathJax.Hub.getAllJax('pretty')[0];
+        MathJax.Hub.Queue(['Text', elem, latex]);
+      }
+      catch (err) { }
     };
-} else if(window.location.pathname == '/login'){
+  } else if (window.location.pathname == '/login') {
     console.log('Connected to login');
-    const loginButton = document.getElementById('loginButton');
-    const username = document.getElementById('usernameInput');
-    const password = document.getElementById('passwordInput');
+    var usernameInput = document.forms[0]["username"]
+    var passwordInput = document.forms[0]["password"]
 
-    $(u)
-} else if(window.location.pathname == '/register'){
+    const loginForm = document.forms[0]
+    const submitButton = document.getElementById("loginButton");
+    const loginErrorMessages = document.getElementById("loginFailedMessage")
+
+    $(submitButton).on('click', function(){
+      var obj = {
+        "username": usernameInput.value,
+        "password": passwordInput.value
+      }
+      $.ajax({
+        type: "POST",
+        url: "/login",
+        data: JSON.stringify(obj),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function(responseData){
+          if(responseData['errors'].length == 0){
+            $(loginErrorMessages).empty()
+            window.location.href = "/"
+          } else {
+            for(var i = 0; i < responseData["errors"].length; i++){
+              $(loginErrorMessages).empty()
+              $(loginErrorMessages).append(responseData['errors'][i])
+            }
+          }
+        }
+      })
+    })
+  } else if (window.location.pathname == '/register') {
     console.log('Connected to register');
-};
 
+    const registerButton = document.getElementById('registerButton'),
+      name = document.getElementById('nameInput'),
+      username = document.getElementById('usernameInput'),
+      email = document.getElementById('emailInput'),
+      password = document.getElementById('passwordInput'),
+      confirmPassword = document.getElementById('confirmPasswordInput'),
+      errorMessages = document.getElementById('errorMessages')
+
+    $(registerButton).on('click', function(){
+      $(errorMessages).empty();
+      var obj = {
+        'name': name.value,
+        'username': username.value,
+        'email': email.value,
+        'password': password.value,
+        'confirmPassword': confirmPassword.value
+      }
+      console.log(obj)
+      $.ajax({
+        type: 'POST',
+        url: '/register',
+        dataType: "json",
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(obj),
+        success: function (responseData) {
+          if(responseData["errorMessages"].length == 0){
+            LOGIN_STATUS = true;
+            window.location.href = '/';
+          } else{
+            for(var i = 0; i < responseData['errorMessages'].length ;i++){
+              $(errorMessages).append('<p>' + responseData['errorMessages'][i] + '</p>')
+            }
+          };
+        },
+        error: function (responseData) {
+          alert('error')
+        }
+      });
+    })
+  }
+}
+);
