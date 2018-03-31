@@ -21,7 +21,7 @@
 # CAUTION: APP WILL NOT WORK AFTER APRIL 30, 2018. MATHJAX CDN WILL NOT BE WORKING
 
 from __future__ import division
-from os import getcwd, listdir, path, chdir
+from os import getcwd, listdir, path, chdir, getenv
 from flask import Flask, render_template, request, session, url_for, redirect, jsonify
 from sympy import integrate, symbols, diff
 from functools import wraps
@@ -30,7 +30,8 @@ from local_db import LOCAL_DB
 
 # App Setup
 app = Flask(__name__)
-app.secret_key = 'DGCalc'
+# Change this to whatever you want if ignoring env variables
+app.secret_key = getenv("DGCALC")
 
 # DB Setup
 historyTable = LOCAL_DB("database", "history")
