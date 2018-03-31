@@ -126,8 +126,8 @@ def register():
     # Checks for errors
     # If there are no errors, create a new user in the user and history table
     if len(errorList) == 0:
-      userTable.insert([[name, username, email, password]])
-      historyTable.insert([[username, None]])
+      userTable.insert(name, username, email, password, "foo", "bar")
+      historyTable.insert(username, None)
 
     return jsonify({"errorMessages": errorList})
 
@@ -234,9 +234,15 @@ def getHistory():
   historyTable.select(session["username"], "username", "history")
   data = historyTable.fetchResults(amount=1)
 
-  obj = list(set(data[0]))
+  # If our user has a previous history
+  if data[0] is not None:
+    obj = list(set(data[0]))
 
-  return jsonify({"history": obj})
+    return jsonify({"history": obj})
+
+  # If the user does not have a history yet
+  else:
+    return jsonify({"history": []})
 
 
 @app.route('/api/get-login-status', methods=['GET'])
