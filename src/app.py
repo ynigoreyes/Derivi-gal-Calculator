@@ -126,7 +126,7 @@ def register():
     # Checks for errors
     # If there are no errors, create a new user in the user and history table
     if len(errorList) == 0:
-      userTable.insert(name, username, email, password, "foo", "bar")
+      userTable.insert(name, username, email, password)
       historyTable.insert(username, None)
 
     return jsonify({"errorMessages": errorList})
@@ -150,30 +150,34 @@ def login():
 
   elif request.method == 'POST':
     data = request.get_json()
-    userInput = data['username']      # Grabs the user input for username
-    pwInput = data['password']        # Grabs the user input for password
     errorList = []
 
-    session['logged_in'] = False      # Used for default case
+    if data['username'] != "" and data['password'] != "":
+      userInput = data['username']      # Grabs the user input for username
+      pwInput = data['password']        # Grabs the user input for password
 
-    # Find the user with that username and grab their password
-    userTable.select(userInput, "username", "password")
+      session['logged_in'] = False      # Used for default case
 
-    # Check if there were results found
-    results = userTable.fetchResults()
-    if len(results) != 0:
+      # Find the user with that username and grab their password
+      userTable.select(userInput, "username", "password")
 
-      if pwInput == results[0]:           # If the user's password is correct
-        session['logged_in'] = True       # Sets the user's status to logged in
-        session['username'] = userInput   # Gives a unique cookie to work with
-        errorList = []
+      # Check if there were results found
+      results = userTable.fetchResults()
+      if len(results) != 0:
 
+        if pwInput == results[0]:           # If the user's password is correct
+          session['logged_in'] = True       # Sets the user's status to logged in
+          session['username'] = userInput   # Gives a unique cookie to work with
+          errorList = []
+
+        else:
+          errorList.append("Invalid Password")
+          session['logged_in'] = False
       else:
-        errorList.append("Invalid Password")
+        errorList.append("No user found with that username")
         session['logged_in'] = False
     else:
-      errorList.append("No user found with that username")
-      session['logged_in'] = False
+      errorList.append("Please fill out all required forms")
 
     return jsonify({"errors": errorList})
 
