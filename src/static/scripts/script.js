@@ -11,6 +11,7 @@ $(function(){
       url: '/api/get-login-status',
       success: function (responseData) {
         if (responseData['status'] == true) {
+          alert("You have logged in. Now you are able to use the history function")
           LOGIN_STATUS = true;
         }
       }
@@ -38,6 +39,13 @@ $(function(){
     setTimeout(function(){
       if(Boolean(LOGIN_STATUS)){getHistory();}
     }, 1)
+
+    // Links the enter key to the solve button
+    window.addEventListener("keyup", function (e) {
+      if (e.keyCode === 13) {
+        solve.click();
+      }
+    })
 
 
     const initEquation = 'sqrt(75 / 3) + sin(x / 4)^2',
@@ -148,6 +156,12 @@ $(function(){
       catch (err) { }
     };
   } else if (window.location.pathname == '/login') {
+    // Links the enter key to the submit button
+    window.addEventListener("keyup", function(e){
+      if(e.keyCode === 13){
+        submitButton.click();
+      }
+    })
     var usernameInput = document.forms[0]["username"]
     var passwordInput = document.forms[0]["password"]
 
@@ -180,6 +194,12 @@ $(function(){
       })
     })
   } else if (window.location.pathname == '/register') {
+    // Links the enter key to the register button
+    window.addEventListener("keyup", function (e) {
+      if (e.keyCode === 13) {
+        registerButton.click();
+      }
+    })
 
     const registerButton = document.getElementById('registerButton'),
       name = document.getElementById('nameInput'),

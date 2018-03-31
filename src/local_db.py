@@ -42,6 +42,8 @@ class LOCAL_DB():
     """
     Associates the table column names with the table name
     """
+
+    # Args is a list
     for data in args:
       self.table_columns.append(str(data))
 
@@ -60,10 +62,10 @@ class LOCAL_DB():
     self.connected = True
     chdir(self.home_dir)
 
-  def insert(self, strings):
+  def insert(self, *args):
     """
     @param strings:
-    A 2-D Array of strings
+    A 1-D Array of strings
     Each row is an "entry"
     Each column in that row is an element.
 
@@ -92,37 +94,47 @@ class LOCAL_DB():
       },
     ]
     """
+    # Error Handling
+    extraInputs = 0
+    if len(args) > len(self.table_columns):
+      extraInputs = len(args) - len(self.table_columns)
+      print("LOCAL_DB_ERROR: Input amount does not match number of columns\nThere are {} extra inputs.".format(extraInputs))
     uniqueID = self.generateID()
 
     tempDict = dict()
     tempList = []
 
     chdir(self.database_dir)
+
+    # If the table is not empty
     if stat(self.table_name + ".json").st_size != 0:
 
+      # Reads the existing data and loads it into the self.insertObj attribute
       initJson = open(self.table_name + ".json", "r")
       data = json.load(initJson)
       self.insertObj = data
       initJson.close()
 
-      initJson = open(self.table_name + ".json", "w+")
-      initJson.close()
+      # Erases the table for rewriting
+      # TODO: Check to see if we can chain the .close()
+      initJson = open(self.table_name + ".json", "w+").close()
 
+    # Once the database is cleared...
     with open(self.table_name + ".json", "a") as table:
-      for index, i in enumerate(strings):
 
-        for key, value in zip(self.table_columns, strings[index]):
-          tempDict[key] = value
-          tempList.append(tempDict)
-          tempDict = {}
+      # TODO: This is the part we want to change. we want
+      # the user to give args, not a list so that it is easier
+      for key, value in zip(self.table_columns, args):
+        tempDict[key] = value
+        tempList.append(tempDict)
+        tempDict = {}
 
-        self.insertObj[str(next(uniqueID))] = tempList
+      self.insertObj[str(next(uniqueID))] = tempList
 
-        if index == len(strings) - 1:
-          json.dump(self.insertObj, table, indent=4)
-          # CHANGE WAS MADE: took out sort_keys=True
+      json.dump(self.insertObj, table, indent=4)
+      # CHANGE WAS MADE: took out sort_keys=True
 
-        tempList = []
+      tempList = []
 
     chdir(self.home_dir)
 
@@ -349,13 +361,11 @@ class LOCAL_DB():
 
     fetchResults(self, amount=0):
 
-    @param int(amount): The amount of results the user would like to fetch
+    @param amount<int>: The amount of results the user would like to fetch
 
     This is how the user will ask for what we were able to find
 
-    @return fetch: If amount was not given or still equals 0, then we will
-    return all results found. If there is an int value, associated with amount,
-    we will return that amount of results to the user a list
+    @return fetch<array of elements>: If amount was not given or still equals 0, then we will return all results found. If there is an int value, associated with amount, we will return that amount of results to the user a list
     """
     fetch = []
 
