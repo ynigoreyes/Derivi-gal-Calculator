@@ -271,7 +271,7 @@ def updateHistory():
   """
   data = request.get_json()
 
-  historyTable.update(session["username"], "username", "history", data["equation"])
+  historyTable.update(session["username"], "username", data["equation"], "history")
 
   return jsonify({"status": "success"})
 

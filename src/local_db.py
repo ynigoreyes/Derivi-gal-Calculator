@@ -268,7 +268,7 @@ class LOCAL_DB():
 
     chdir(self.home_dir)
 
-  def replace(self, targetValue, targetColumn, selectColumn, replaceValue):
+  def replace(self, targetValue, targetColumn, replaceValue, selectColumn):
     """
     @param targetColumn:
     The column we want to reference
@@ -277,7 +277,7 @@ class LOCAL_DB():
 
     @param selectColumn:
     The column we are going to update
-    @param updateValue:
+    @param replaceValue:
     The value we are going to replace the selectColumn with
 
     Replace a column in the table where ther targetColumn and targetValue are going to match.
@@ -285,8 +285,6 @@ class LOCAL_DB():
 
     targetColumnNumber = self.__getColumnNumber(targetColumn)
     selectColumnNumber = self.__getColumnNumber(selectColumn)
-
-    print(targetColumnNumber, selectColumnNumber)
 
     if targetColumnNumber is None or selectColumnNumber is None:
       print("LOCAL_DB_ERROR: No Columns found to update")
@@ -297,16 +295,14 @@ class LOCAL_DB():
     data = json.load(open(self.table_name + ".json"))
     for keys in data.keys():
       temp = data[keys][targetColumnNumber][targetColumn]
-      print(data[keys][targetColumnNumber][targetColumn])
       if targetValue == temp:
         data[keys][selectColumnNumber][selectColumn] = replaceValue
-        print(data)
         with open(self.table_name + ".json", "w+") as table:
           json.dump(data, table, indent=4)
 
     chdir(self.home_dir)
 
-  def update(self, targetValue, targetColumn, selectColumn, updateValue):
+  def update(self, targetValue, targetColumn, updateValue, selectColumn):
     """
     @param targetColumn:
     The column we want to reference
