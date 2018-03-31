@@ -208,7 +208,7 @@ $(function(){
         success: function (responseData) {
           if(responseData["errorMessages"].length == 0){
             LOGIN_STATUS = true;
-            window.location.href = '/';
+            window.location.href = '/login';
           } else{
             for(var i = 0; i < responseData['errorMessages'].length ;i++){
               $(errorMessages).append('<p>' + responseData['errorMessages'][i] + '</p>')
