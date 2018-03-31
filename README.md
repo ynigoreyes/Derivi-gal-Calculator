@@ -1,24 +1,34 @@
 # Derivi-gal Calculator
+<strong>This application is available at [dg-calculus.herokuapp.com](dg-calculus.herokuapp.com)</strong>
+<br>
+<br>
 Based on the websites [https://www.derivative-calculator.net/](https://www.derivative-calculator.net/) and [https://www.integral-calculator.com/](https://www.integral-calculator.com/)
 
-### Purpose
+
+## Purpose
+
 To demonstrate the real world uses of Python in the real world. This project
 focuses on web application development and students will learn how to use the
 Python-Flask Web Application Framework to make a simple API that saves user
 credentials, and equation history
 
-### Requirements
+## Requirements
+
 * Python 3 (uses 3.6.4)
 * Your favorite CLI
 * Pip installed
 
-### How to use
+## How to use
+
 1. Clone repository using Command Line
+
 ```
 $ git clone https://github.com/ynigoreyes/Derivi-gal-Calculator.git
 $ cd Derivi-gal-Calculator
 ```
+
 2. Install requirements on pip
+
 ```
 $ pip install -r requirements.txt
 ```
