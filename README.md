@@ -1,5 +1,5 @@
 # Derivi-gal Calculator
-<strong>This application is available at [https://dg-calculus.herokuapp.com/](dg-calculus.herokuapp.com)</strong>
+<strong>This application is available at [dg-calculus.herokuapp.com/](https://dg-calculus.herokuapp.com/)</strong>
 <br>
 <br>
 Based on the websites [https://www.derivative-calculator.net/](https://www.derivative-calculator.net/) and [https://www.integral-calculator.com/](https://www.integral-calculator.com/)
