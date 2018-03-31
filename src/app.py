@@ -150,35 +150,33 @@ def login():
     return render_template('login.html')
 
   elif request.method == 'POST':
+
     data = request.get_json()
-    errorList = []
+    errorList = []                    # Will hold all of the errors we will pass
 
-    if data['username'] != "" and data['password'] != "":
-      userInput = data['username']      # Grabs the user input for username
-      pwInput = data['password']        # Grabs the user input for password
+    userInput = data['username']      # Grabs the user input for username
+    pwInput = data['password']        # Grabs the user input for password
+    session['logged_in'] = False      # Used for default case
 
-      session['logged_in'] = False      # Used for default case
+    # Find the user with that username and grab their password
+    userTable.select(userInput, "username", "password")
+    results = userTable.fetchResults()
 
-      # Find the user with that username and grab their password
-      userTable.select(userInput, "username", "password")
-
-      # Check if there were results found
-      results = userTable.fetchResults()
-      if len(results) != 0:
-
-        if pwInput == results[0]:           # If the user's password is correct
-          session['logged_in'] = True       # Sets the user's status to logged in
-          session['username'] = userInput   # Gives a unique cookie to work with
-          errorList = []
-
-        else:
-          errorList.append("Invalid Password")
-          session['logged_in'] = False
-      else:
-        errorList.append("No user found with that username")
-        session['logged_in'] = False
-    else:
+    if data['username'] == "" or data['password'] == "":
       errorList.append("Please fill out all required forms")
+
+    # Check if there were results found
+    if len(results) == 0:
+      errorList.append("No user found with that username")
+
+    # Checks if the username exists and the password matches
+    elif len(results) != 0 and pwInput == results[0]:
+      errorList = []
+      session['username'] = userInput   # Gives a unique cookie to work with
+      session['logged_in'] = True       # Sets the user's status to logged in
+
+    else:
+      errorList.append("Invalid username or password")
 
     return jsonify({"errors": errorList})
 

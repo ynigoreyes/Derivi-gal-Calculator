@@ -102,7 +102,6 @@ $(function(){
               result.innerHTML = math.format(math.parse(answer));
               // Displays an error message
             }
-            // $("div#userHistory").append("<p class='prevPosts btn btn-secondary'>" + equationPost + "<p>");
           }
         });
 
@@ -174,6 +173,7 @@ $(function(){
         "username": usernameInput.value,
         "password": passwordInput.value
       }
+      // Submits login form to backend for error handling
       $.ajax({
         type: "POST",
         url: "/login",
@@ -185,9 +185,9 @@ $(function(){
             $(loginErrorMessages).empty()
             window.location.href = "/"
           } else {
+            $(loginErrorMessages).empty()
             for(var i = 0; i < responseData["errors"].length; i++){
-              $(loginErrorMessages).empty()
-              $(loginErrorMessages).append(responseData['errors'][i])
+              $(loginErrorMessages).append("<p>" + responseData['errors'][i] + "</p>")
             }
           }
         }
