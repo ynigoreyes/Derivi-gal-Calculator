@@ -10,7 +10,7 @@
 # Many of the students that attend ACMSDC Python Software Development are underclassman
 # who may have never had any experience programming before and there are some students
 # who come thinking that Python is useless and a kid's language. This type of web app's
-# difficulty to high enough to challenge the beginners and show the naysayers that
+# difficulty is high enough to challenge the beginners and show the naysayers that
 # Python is used in the real world. In this case, it was used for rapid development.
 #
 # The situation goes as stated...
