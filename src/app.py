@@ -188,11 +188,6 @@ def logout():
   return redirect(url_for("home"))
 
 
-@app.route('/account', methods=['GET'])
-def account():
-  return render_template('account.html')
-
-
 @app.route('/api/evaluate', methods=['POST'])
 def evaluate():
   """
@@ -239,7 +234,16 @@ def getHistory():
 
   # If our user has a previous history
   if data[0] is not None:
-    obj = list(set(data[0]))
+
+    obj = []
+    # Creates a new list of equations without duplicates
+    # while keeping the order of the equations the same
+    for eq in data[0]:
+      if eq not in obj:
+        obj.append(eq)
+
+    # Replaces the old history with one that does not include any duplicates
+    historyTable.replace(session['username'], 'username', obj,'history')
 
     return jsonify({"history": obj})
 
@@ -247,15 +251,6 @@ def getHistory():
   else:
     return jsonify({"history": []})
 
-
-@app.route('/api/get-login-status', methods=['GET'])
-def getLoginStatus():
-  status = False
-
-  if 'logged_in' in session.keys():
-    status = session['logged_in']
-
-  return jsonify({"status": status})
 
 
 @app.route('/api/update-history', methods=['POST'])
@@ -269,10 +264,22 @@ def updateHistory():
   }
   """
   data = request.get_json()
+  equation = data['equation'].replace(" ", "")
 
-  historyTable.update(session["username"], "username", data["equation"], "history")
+  historyTable.update(session["username"], "username", equation, "history")
 
   return jsonify({"status": "success"})
 
+
+@app.route('/api/get-login-status', methods=['GET'])
+def getLoginStatus():
+  status = False
+
+  if 'logged_in' in session.keys():
+    status = session['logged_in']
+
+  return jsonify({"status": status})
+
+
 if __name__ == '__main__':
-  app.run()
+  app.run(debug=True)

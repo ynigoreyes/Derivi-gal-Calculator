@@ -12,19 +12,5 @@
         {
             "password": "admin"
         }
-    ],
-    "14487715374086667828": [
-        {
-            "name": "TestUser"
-        },
-        {
-            "username": "miggylol"
-        },
-        {
-            "email": "miggy@gmail.com"
-        },
-        {
-            "password": "password"
-        }
     ]
 }

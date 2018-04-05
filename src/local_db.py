@@ -18,25 +18,25 @@ class LOCAL_DB():
 
     """
     # Cache for the database and home directories for ease in navigation
-    self.database_dir = path.normpath(getcwd() + '/' + db_name)
-    self.home_dir = path.normpath(getcwd())
+    self.__database_dir = path.normpath(getcwd() + '/' + db_name)
+    self.__home_dir = path.normpath(getcwd())
 
-    self.db_name = db_name          # This is the name of the database directory
-    self.table_name = table_name    # This is the name of the table in the directory
-    self.errorMessage = None        # This is an error message we can pass to the user
-    self.connected = False          # This is our connection status
-    self.fetch = []                 # This is a list of items that we find
+    self.__db_name = db_name          # This is the name of the database directory
+    self.__table_name = table_name    # This is the name of the table in the directory
+    self.__errorMessage = None        # This is an error message we can pass to the user
+    self.__connected = False          # This is our connection status
+    self.__fetch = []                 # This is a list of items that we find
 
-    self.table_columns = []         # Variable used to store the
+    self.__table_columns = []       # Variable used to store the
                     								# columns of each db instance
-    self.insertObj = {}             # Used in the insert method
+    self.__insertObj = {}           # Used in the insert method
                     								# Creates a dictionary to dump into the table
 
     if db_name not in listdir(): # Makes sure the database does not exist yet
       print('creating database for the first time')
-      mkdir(self.database_dir)    	# Makes the database dir if it does not exist
+      mkdir(self.__database_dir)    	# Makes the database dir if it does not exist
 
-    self.__connect(self.table_name) # Creates a the table within the database directory
+    self.__connect(self.__table_name) # Creates a the table within the database directory
 
   def createColumns(self, *args):
     """
@@ -45,7 +45,7 @@ class LOCAL_DB():
 
     # Args is a list
     for data in args:
-      self.table_columns.append(str(data))
+      self.__table_columns.append(str(data))
 
   def __connect(self, table_name):
     """
@@ -54,13 +54,13 @@ class LOCAL_DB():
     Creates a table/collection in the database directory
     """
 
-    chdir(self.database_dir)
+    chdir(self.__database_dir)
 
     with open(table_name + ".json", "a"):
         print('connecting to table "{}"...'.format(table_name))
 
-    self.connected = True
-    chdir(self.home_dir)
+    self.__connected = True
+    chdir(self.__home_dir)
 
   def insert(self, *args):
     """
@@ -96,47 +96,47 @@ class LOCAL_DB():
     """
     # Error Handling
     extraInputs = 0
-    if len(args) > len(self.table_columns):
-      extraInputs = len(args) - len(self.table_columns)
+    if len(args) > len(self.__table_columns):
+      extraInputs = len(args) - len(self.__table_columns)
       print("LOCAL_DB_ERROR: Input amount does not match number of columns\nThere are {} extra inputs.".format(extraInputs))
     uniqueID = self.generateID()
 
     tempDict = dict()
     tempList = []
 
-    chdir(self.database_dir)
+    chdir(self.__database_dir)
 
     # If the table is not empty
-    if stat(self.table_name + ".json").st_size != 0:
+    if stat(self.__table_name + ".json").st_size != 0:
 
-      # Reads the existing data and loads it into the self.insertObj attribute
-      initJson = open(self.table_name + ".json", "r")
+      # Reads the existing data and loads it into the self.__insertObj attribute
+      initJson = open(self.__table_name + ".json", "r")
       data = json.load(initJson)
-      self.insertObj = data
+      self.__insertObj = data
       initJson.close()
 
       # Erases the table for rewriting
       # TODO: Check to see if we can chain the .close()
-      initJson = open(self.table_name + ".json", "w+").close()
+      initJson = open(self.__table_name + ".json", "w+").close()
 
     # Once the database is cleared...
-    with open(self.table_name + ".json", "a") as table:
+    with open(self.__table_name + ".json", "a") as table:
 
       # TODO: This is the part we want to change. we want
       # the user to give args, not a list so that it is easier
-      for key, value in zip(self.table_columns, args):
+      for key, value in zip(self.__table_columns, args):
         tempDict[key] = value
         tempList.append(tempDict)
         tempDict = {}
 
-      self.insertObj[str(next(uniqueID))] = tempList
+      self.__insertObj[str(next(uniqueID))] = tempList
 
-      json.dump(self.insertObj, table, indent=4)
+      json.dump(self.__insertObj, table, indent=4)
       # CHANGE WAS MADE: took out sort_keys=True
 
       tempList = []
 
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def remove(self, value, key, howMany="all"):
     """
@@ -161,10 +161,10 @@ class LOCAL_DB():
       howMany = True
       pass
 
-    chdir(self.database_dir)
+    chdir(self.__database_dir)
 
     # This is the json object we will be using
-    data = json.load(open(self.table_name + ".json"))
+    data = json.load(open(self.__table_name + ".json"))
 
     wantedColumn = self.__getColumnNumber(key)
 
@@ -184,7 +184,7 @@ class LOCAL_DB():
           try:
             del data[keyToDelete]
 
-            with open(self.table_name + ".json", "w+") as openJson:
+            with open(self.__table_name + ".json", "w+") as openJson:
               json.dump(data, openJson, indent=4)
 
           except:
@@ -202,12 +202,12 @@ class LOCAL_DB():
           try:
             del data[keyToDelete]
 
-            with open(self.table_name + ".json", "w+") as openJson:
+            with open(self.__table_name + ".json", "w+") as openJson:
               json.dump(data, openJson, indent=4)
 
           except:
             break
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def select(self, targetValue, targetColumn, selectColumn):
     """
@@ -215,34 +215,34 @@ class LOCAL_DB():
 
     In relation to common SQL scripts...
 
-    SELECT <selectColumn> FROM self.table_name
+    SELECT <selectColumn> FROM self.__table_name
     WHERE <targetColumn> is <targetValue>
 
-    Will save the results in the self.fetch list for processing when the
+    Will save the results in the self.__fetch list for processing when the
     user calls the fetch method, which then returns the amount of requested
     results.
     """
-    self.fetch = []
+    self.__fetch = []
 
     targetColumnNumber = self.__getColumnNumber(targetColumn)
     selectColumnNumber = self.__getColumnNumber(selectColumn)
 
     # Search begins
     # Changes to the database directory
-    chdir(self.database_dir)
-    data = json.load(open(self.table_name + ".json"))
+    chdir(self.__database_dir)
+    data = json.load(open(self.__table_name + ".json"))
 
     if targetColumnNumber is not None and selectColumnNumber is not None:
       for keys in data.keys(): # Goes through the UUID's
         # The variable we are going to save into the list if there is a match
         if targetValue == data[keys][targetColumnNumber][targetColumn]:
-          self.fetch.append(data[keys][selectColumnNumber][selectColumn])
+          self.__fetch.append(data[keys][selectColumnNumber][selectColumn])
     else:
       # This means that there was no columns found
       # with that name or that there were no matching values
       pass
 
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def selectAny(self, targetColumn):
     """
@@ -252,21 +252,21 @@ class LOCAL_DB():
 
     @return: None
     """
-    self.fetch = []
+    self.__fetch = []
     targetColumnNumber = self.__getColumnNumber(targetColumn)
 
     # Changes to the database directory
-    chdir(self.database_dir)
-    if stat(self.table_name + ".json").st_size != 0:
-      data = json.load(open(self.table_name + ".json"))
+    chdir(self.__database_dir)
+    if stat(self.__table_name + ".json").st_size != 0:
+      data = json.load(open(self.__table_name + ".json"))
 
       # Goes through the keys and saves all of the values in that column
       for keys in data.keys():
-        self.fetch.append(data[keys][targetColumnNumber][targetColumn])
+        self.__fetch.append(data[keys][targetColumnNumber][targetColumn])
     else:
       print("Empty File")
 
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def replace(self, targetValue, targetColumn, replaceValue, selectColumn):
     """
@@ -290,17 +290,17 @@ class LOCAL_DB():
       print("LOCAL_DB_ERROR: No Columns found to update")
       quit()
 
-    chdir(self.database_dir)
+    chdir(self.__database_dir)
 
-    data = json.load(open(self.table_name + ".json"))
+    data = json.load(open(self.__table_name + ".json"))
     for keys in data.keys():
       temp = data[keys][targetColumnNumber][targetColumn]
       if targetValue == temp:
         data[keys][selectColumnNumber][selectColumn] = replaceValue
-        with open(self.table_name + ".json", "w+") as table:
+        with open(self.__table_name + ".json", "w+") as table:
           json.dump(data, table, indent=4)
 
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def update(self, targetValue, targetColumn, updateValue, selectColumn):
     """
@@ -328,10 +328,10 @@ class LOCAL_DB():
       print("LOCAL_DB_ERROR: targetValue and selectValue cannot be the same")
       quit()
 
-    chdir(self.database_dir)
+    chdir(self.__database_dir)
     updateColumnList = []
 
-    data = json.load(open(self.table_name + ".json"))
+    data = json.load(open(self.__table_name + ".json"))
     for keys in data.keys():
       temp = data[keys][targetColumnNumber][targetColumn]
       if targetValue == temp:
@@ -344,13 +344,13 @@ class LOCAL_DB():
         valueToUpdate.append(updateValue)
         data[keys][selectColumnNumber][selectColumn] = valueToUpdate
 
-        with open(self.table_name + ".json", "w+") as table:
+        with open(self.__table_name + ".json", "w+") as table:
           json.dump(data, table, indent=4)
 
         # Stop looking for columns to update
         break
 
-    chdir(self.home_dir)
+    chdir(self.__home_dir)
 
   def fetchResults(self, amount=0):
     """
@@ -366,11 +366,11 @@ class LOCAL_DB():
     fetch = []
 
     if amount == 0:
-      fetch = self.fetch
+      fetch = self.__fetch
     else:
-      fetch = self.fetch[0:amount]
+      fetch = self.__fetch[0:amount]
 
-    self.fetch = []
+    self.__fetch = []
     return fetch
 
   def __getColumnNumber(self, wantedColumn):
@@ -381,7 +381,7 @@ class LOCAL_DB():
     a number is needed to represent the columns since the collection is a
     list of dictionaries
     """
-    for columnNumbers, columnNames in enumerate(self.table_columns):
+    for columnNumbers, columnNames in enumerate(self.__table_columns):
       if columnNames == wantedColumn:
         return columnNumbers
 
